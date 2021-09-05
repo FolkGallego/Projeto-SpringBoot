@@ -17,26 +17,35 @@
 form input[type=submit]{
 	color : white;
 }
+
+form {
+	margin-left: 35%;
+	margin-top: 11%;
+}
+
+.col .row{
+margin-right: 0rem;
+
+}
+
 </style>
 
 </head>
 <body>
-
-	<h1>Acesso ao Sistema</h1>
-	
 	<form th:action="@{/login}" method="post" class="col s12">
 
+		<h5>Acesso ao Sistema</h5>
 		<div class="row">
 			<div class="input-fiel col s6">
 				<label>Login</label> 
-				<input type="text" name="username">
+				<input type="text" name="username" style="border-radius: 10px;" >
 			</div>
 		</div>
 		<br>
 		<div class="row">
 			<div class="input-fiel col s6">
 				<label>Senha</label> 
-				<input type="password" name="password">
+				<input type="password" name="password" style="border-radius: 10px;" >
 			</div>
 		</div>
 		<div class="row">

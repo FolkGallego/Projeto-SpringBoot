@@ -19,16 +19,39 @@
 <script
 	src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 
+<!-- Adicionando JQuery -->
+<script src="https://code.jquery.com/jquery-3.2.1.min.js"
+	integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+	crossorigin="anonymous"></script>
+
+<script src="https://unpkg.com/gijgo@1.9.13/js/gijgo.min.js"
+	type="text/javascript"></script>
+<link href="https://unpkg.com/gijgo@1.9.13/css/gijgo.min.css"
+	rel="stylesheet" type="text/css" />
 
 
 <style type="text/css">
-table.striped>tbody>tr:nth-child(odd) {
-	background-color: rgba(158, 154, 154, 0.5);
+table.striped>tbody>tr:nth-child(even) {
+	background-color: #f2f2f2;
 }
 
 form input[type=submit] {
 	color: white;
 }
+
+table {
+  width: 100%;
+}
+table td, table th {
+  border: 1px solid black;
+  padding: 15px;
+  text-align: left;
+}
+
+table th {
+  background: #7CFC00;
+}
+
 </style>
 
 </head>
@@ -45,7 +68,7 @@ form input[type=submit] {
 		<br />
 
 		<form action="salvarpessoa" method="POST" th:object="${pessoaobj}"
-			class="col s12" id="formpessoa">
+			class="col s12" id="formpessoa" enctype="multipart/form-data">
 
 			<fieldset>
 				<legend>Dados da Pessoa</legend>
@@ -78,15 +101,50 @@ form input[type=submit] {
 				</div>
 
 				<div class="row">
-					<div class="input-fiel col s12">
+					<div class="input-fiel col s6">
 						<label for="sexopessoa" class="active">Sexo Pessoa:</label> <select
-							class="browser-default" th:field="*{sexopessoa}">
+							class="browser-default" th:field="*{sexopessoa}" id="sexopessoa">
 							<option value="" disabled selected>Escolha uma Opção</option>
 							<option value="FEMININO" th:text="Feminino" />
 							<option value="MASCULINO" th:text="Masculino" />
 						</select>
 					</div>
+
+					<div class="input-fiel col s6">
+						<label for="profissao" class="active"> Profissão Pessoa: </label>
+						<select class="browser-default" th:field="*{profissao}"
+							id="profissao">
+							<option value="" disabled selected>Escolha uma Opção</option>
+							<option th:each="p : ${profissoes}" th:value="${p.id}"
+								th:text="${p.nome}">
+						</select>
+					</div>
 				</div>
+
+				<div class="row">
+					<div class="input-fiel col s6">
+						<label for="cargo" class="active">Cargo Pessoa:</label> <select
+							class="browser-default" th:field="*{cargo}" id="cargo">
+							<option th:each="c : ${T(curso.springboot.model.Cargo).values()}"
+								th:value="${c.valor}" th:text="${c.nome}">
+						</select>
+					</div>
+
+					<div class="input-fiel col s6">
+						<label for="dataNascimento" class="active">Data
+							Nascimento:</label> <input id="dataNascimento"
+							th:field="*{dataNascimento}" name="dataNascimento"
+							placeholder="Data Nascimento">
+					</div>
+				</div>
+				
+				<div class="row">
+				<div class="input-fiel col s6">
+						<label for="file" class="active">Foto:</label> 
+						<input type="file" id="file" name="file" class="file-field input-field" >
+					</div>
+				</div>
+
 			</fieldset>
 
 			<fieldset>
@@ -141,32 +199,29 @@ form input[type=submit] {
 
 			<div class="row">
 				<div class="input-field col s6">
-					<input class="waves-effect waves-light btn" type="submit"
-						value="Salvar" /> <a class="waves-effect waves-light btn-small"
-						href="/cadastropessoa"
-						onclick="document.getElementById('formpessoa').reset();">Novo</a>
+					<input class="waves-effect waves-light btn" type="submit" value="Salvar" /> 
+					<button class="waves-effect waves-light btn" onclick="document.getElementById('formpessoa').reset();">Novo</button>		
 				</div>
 			</div>
 		</form>
 	</div>
-	<br />
-	<br />
 
 	<fieldset>
 		<legend>Campo de Pesquisa</legend>
 		<div class="row">
-			<form action="pesquisarpessoa" method="POST" class="col s12" id="pesquisarpessoa">
+			<form action="pesquisarpessoa" method="POST" class="col s12"
+				id="pesquisarpessoa">
 				<div class="row">
 					<div class="input-field col s6">
 						<label for="nomepesquisa" class="active">Pesquisa por
 							Nome:</label> <input name="nomepesquisa" id="nomepesquisa"
-							class="validate">
+							class="validate" th:value="${nomepesquisa}">
 					</div>
 
 					<div class="input-field col s6">
 						<label for="pesqsexo" class="active">Pesquisa Sexo</label> <select
 							class="browser-default" name="pesqsexo" id="pesqsexo">
-							<option value="" >Todos</option>
+							<option value="">Todos</option>
 							<option value="FEMININO" th:text="Feminino" />
 							<option value="MASCULINO" th:text="Masculino" />
 						</select>
@@ -174,7 +229,8 @@ form input[type=submit] {
 
 					<div class="input-field col s12">
 						<input class="waves-effect waves-light btn" type="submit"
-							value="PDF" onclick="document.getElementById('pesquisarpessoa').method = 'GET'">
+							value="PDF"
+							onclick="document.getElementById('pesquisarpessoa').method = 'GET'">
 						<input class="waves-effect waves-light btn" type="submit"
 							value="Buscar"> <a class="waves-effect waves-light btn"
 							href="/listapessoas">Lista de Pessoas</a>
@@ -183,37 +239,61 @@ form input[type=submit] {
 			</form>
 		</div>
 	</fieldset>
-
-	<table class="striped">
+<br>
+	<table class="bordered striped centered highlight responsive-table" >
 		<thead>
 			<tr>
 				<th>ID</th>
 				<th>Nome</th>
 				<th>Sobrenome</th>
-				<th>Idade</th>
+				<th>Anexo</th>
 				<th>Editar</th>
 				<th>Excluir</th>
+				<th>Telefones</th>
 			</tr>
 		</thead>
-		<tr th:each="pessoa : ${pessoas}">
+		<tr th:each="pessoa : ${pessoas.content}">
 			<td th:text="${pessoa.id}"></td>
-			<td><a th:href="@{/telefones/{idpessoa}(idpessoa=${pessoa.id})}"><span
-					th:text="${pessoa.nome}"></span></a></td>
+			<td th:text="${pessoa.nome}"></td>
 			<td th:text="${pessoa.sobrenome}"></td>
-			<td th:text="${pessoa.idade}"></td>
-			<td><a
-				th:href="@{/editarpessoa/{idpessoa}(idpessoa=${pessoa.id})}">Editar</a></td>
-			<td><a
-				th:href="@{/removerpessoa/{idpessoa}(idpessoa=${pessoa.id})}">Excluir</a></td>
+			<td>
+			<a th:if="${pessoa.curriculo != null}" th:href="@{/baixarcurriculo/{idpessoa}(idpessoa=${pessoa.id})}" >Download</a> 
+			<a th:if="${pessoa.curriculo == null}" style="color: red;">Indisponível</a>
+			</td>
+			<td><a th:href="@{/editarpessoa/{idpessoa}(idpessoa=${pessoa.id})}">Editar</a></td>
+			<td><a th:href="@{/removerpessoa/{idpessoa}(idpessoa=${pessoa.id})}">Excluir</a></td>
+			<td><a th:href="@{/telefones/{idpessoa}(idpessoa=${pessoa.id})}">Telefones</a></td>
 		</tr>
 	</table>
-
+	
+<div class="row" style="margin-top: 30px;">
+ <center>
+ 
+     <span th:if="${pessoas.hasPrevious()}">
+         <a th:href="@{/pessoaspag(page=${pessoas.number-1}, size=${pessoas.size}, nomepesquisa=${nomepesquisa})}">Anterior</a>
+     </span>
+ 
+    <th:block th:each="i: ${#numbers.sequence(0, pessoas.totalPages - 1)}"> 
+            <a th:href="@{/pessoaspag(page=${i}, size=${pessoas.size}, nomepesquisa=${nomepesquisa})}">[[ ${i} + 1 ]]</a>
+    </th:block>
+    
+    <span th:if="${pessoas.hasNext()}">
+         <a th:href="@{/pessoaspag(page=${pessoas.number+1}, size=${pessoas.size}, nomepesquisa=${nomepesquisa})}">Próximo</a>
+     </span>
+    
+ </center>
+</div>
 
 	<!-- Adicionando Javascript -->
 	<script>
 		$(document)
 				.ready(
 						function() {
+							
+							$('#dataNascimento').datepicker({
+				        		showOthermonths:true,
+				        		format: 'yyyy-mm-dd'
+				        	});
 
 							function limpa_formulário_cep() {
 								// Limpa valores do formulário de cep.

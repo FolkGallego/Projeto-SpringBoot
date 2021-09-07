@@ -258,7 +258,7 @@ table th {
 			<td th:text="${pessoa.sobrenome}"></td>
 			<td>
 			<a th:if="${pessoa.curriculo != null}" th:href="@{/baixarcurriculo/{idpessoa}(idpessoa=${pessoa.id})}" >Download</a> 
-			<a th:if="${pessoa.curriculo == null}" style="color: red;">Indisponível</a>
+			<a th:if="${pessoa.curriculo == null}" style="color: red;">- Indisponível -</a>
 			</td>
 			<td><a th:href="@{/editarpessoa/{idpessoa}(idpessoa=${pessoa.id})}">Editar</a></td>
 			<td><a th:href="@{/removerpessoa/{idpessoa}(idpessoa=${pessoa.id})}">Excluir</a></td>
